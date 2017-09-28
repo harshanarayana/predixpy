@@ -51,7 +51,7 @@ class Service(object):
         }
         return headers
 
-    def _get(self, uri, params=None, headers=None):
+    def _get(self, uri, params=None, headers=None, convert_to_json=True):
         """
         Simple GET request for a given path.
         """
@@ -64,6 +64,8 @@ class Service(object):
         response = self.session.get(uri, headers=headers, params=params)
         logging.debug("STATUS=" + str(response.status_code))
         if response.status_code == 200:
+            if not convert_to_json:
+                return response.text
             return response.json()
         else:
             logging.error("ERROR=" + response.content)
@@ -80,7 +82,7 @@ class Service(object):
 
         response = self.session.post(uri, headers=headers,
                 data=json.dumps(data))
-        if response.status_code in [200, 204]:
+        if response.status_code in [200, 204, 201]:
             return response.json()
         else:
             logging.error(response.content)
